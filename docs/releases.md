@@ -2,7 +2,7 @@
 
 `.github/workflows/release.yml` publishes stable lowercase `vMAJOR.MINOR.PATCH`
 tags in **Atentor/WebRad**. It produces Windows x64 Setup/Squirrel, Linux x64
-DEB/RPM, and macOS Intel/Apple Silicon ZIPs containing `WebRad.app`. IDE releases
+AppImage/DEB/RPM, and macOS Intel/Apple Silicon ZIPs containing `WebRad.app`. IDE releases
 do not include iOS; generated application targets are a separate [Native Build](native-build.md)
 feature. Packages are published in [WebRAD Releases](https://github.com/Atentor/WebRad/releases).
 
@@ -139,6 +139,8 @@ Latest-version comparison paginates all Releases so old tags cannot become lates
 - **Linux packages:** the executable must belong to `webrad`. APT, DNF, or Zypper
   installs a verified DEB/RPM using pkexec/polkit authorization. Cancel/failure
   keeps the IDE open. No downloaded privileged shell script is executed.
+- **Linux AppImage:** downloads a verified AppImage for manual replacement. AppImage
+  updates do not request package-manager authorization.
 - **Signed macOS:** Squirrel.Mac uses architecture-specific ZIP/feed when both
   installed and incoming versions have Developer ID signatures.
 - **Unsigned macOS:** verified ZIP download is revealed in Finder for manual
@@ -173,7 +175,7 @@ one manual replacement.
 
 ## Distribution contract
 
-Public releases contain installers, `RELEASES`, Squirrel `.nupkg`,
+Public releases contain installers, `RELEASES`, Squirrel `.nupkg`, Linux `.AppImage`,
 `webrad-darwin-x64.json`, `webrad-darwin-arm64.json`, `webrad-update.json`, and
 `SHA256SUMS`. Manifest format 1 records version, date, platform/architecture/format,
 filename, size, SHA-256, and macOS signing status. Mac feeds use

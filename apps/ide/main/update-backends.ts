@@ -172,10 +172,13 @@ export async function selectUpdateBackend(
         return stdout;
       },
     );
-    const target = targets.find((item) => item.kind === (installer?.kind ?? 'deb'));
+    const target =
+      targets.find((item) => item.kind === installer?.kind) ??
+      (process.env.APPIMAGE ? targets.find((item) => item.kind === 'appimage') : undefined) ??
+      targets.find((item) => item.kind === 'deb');
     if (!target)
       throw new Error('No Linux update is available for this package format and architecture.');
-    let authorizedInstaller = installer;
+    let authorizedInstaller = installer && target.kind === installer.kind ? installer : undefined;
     if (installer) {
       try {
         await execute('/usr/bin/pkexec', ['--version'], { timeout: 10_000 });
