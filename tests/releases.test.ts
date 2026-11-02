@@ -139,8 +139,11 @@ describe('tagged release assembly', () => {
           );
           await fs.writeFile(path.join(make, 'WebRad Setup.exe'), 'exe fixture');
         } else if (platform === 'linux') {
-          for (const kind of ['deb', 'rpm'])
-            await fs.writeFile(path.join(make, `webrad.${kind}`), `${kind} fixture`);
+          for (const kind of ['appimage', 'deb', 'rpm'])
+            await fs.writeFile(
+              path.join(make, kind === 'appimage' ? 'webrad.AppImage' : `webrad.${kind}`),
+              `${kind} fixture`,
+            );
         } else await fs.writeFile(path.join(make, 'webrad.zip'), `${arch} ZIP fixture`);
         await fs.writeFile(path.join(make, 'private-source.ts'), 'must never be published');
         run(build, 'stage', {
@@ -157,7 +160,7 @@ describe('tagged release assembly', () => {
         JSON.parse(await fs.readFile(path.join(publicDirectory, 'webrad-update.json'), 'utf8')),
       );
       expect(manifest.version).toBe(version);
-      expect(manifest.targets).toHaveLength(5);
+      expect(manifest.targets).toHaveLength(6);
       expect(
         manifest.targets
           .filter((target) => target.kind === 'mac')

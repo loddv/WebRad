@@ -68,13 +68,20 @@ async function assembledRelease(): Promise<{ root: string; assets: string }> {
   await fs.mkdir(assets);
   for (const [platform, arch, kinds] of [
     ['win32', 'x64', ['squirrel']],
-    ['linux', 'x64', ['deb', 'rpm']],
+    ['linux', 'x64', ['appimage', 'deb', 'rpm']],
     ['darwin', 'x64', ['mac']],
     ['darwin', 'arm64', ['mac']],
   ] as const) {
     const targets = [];
     for (const kind of kinds) {
-      const extension = kind === 'squirrel' ? 'nupkg' : kind === 'mac' ? 'zip' : kind;
+      const extension =
+        kind === 'squirrel'
+          ? 'nupkg'
+          : kind === 'mac'
+            ? 'zip'
+            : kind === 'appimage'
+              ? 'AppImage'
+              : kind;
       const file = `WebRad-0.2.0-${platform}-${arch}.${extension}`;
       const content = Buffer.from(`${platform}/${arch}/${kind} installer`);
       await fs.writeFile(path.join(assets, file), content);

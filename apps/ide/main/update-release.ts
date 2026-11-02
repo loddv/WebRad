@@ -10,7 +10,7 @@ export const updateTargetSchema = z
   .object({
     platform: z.enum(['win32', 'linux', 'darwin']),
     arch: z.enum(['x64', 'arm64']),
-    kind: z.enum(['squirrel', 'deb', 'rpm', 'mac']),
+    kind: z.enum(['squirrel', 'appimage', 'deb', 'rpm', 'mac']),
     file: assetNameSchema,
     size: z
       .number()
@@ -64,12 +64,18 @@ export function parseUpdateManifest(input: unknown): UpdateManifest {
     if (keys.has(key)) throw new Error('Duplicate update target.');
     keys.add(key);
     const extension =
-      target.kind === 'mac' ? '.zip' : target.kind === 'squirrel' ? '.nupkg' : `.${target.kind}`;
+      target.kind === 'mac'
+        ? '.zip'
+        : target.kind === 'squirrel'
+          ? '.nupkg'
+          : target.kind === 'appimage'
+            ? '.AppImage'
+            : `.${target.kind}`;
     if (
       !target.file.endsWith(extension) ||
       (target.kind === 'mac' && target.platform !== 'darwin') ||
       (target.kind === 'squirrel' && target.platform !== 'win32') ||
-      (['deb', 'rpm'].includes(target.kind) && target.platform !== 'linux')
+      (['appimage', 'deb', 'rpm'].includes(target.kind) && target.platform !== 'linux')
     ) {
       throw new Error('Update artifact does not match its platform.');
     }

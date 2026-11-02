@@ -56,6 +56,7 @@ async function verifyTargets(directory, targets) {
   const expected = [
     'darwin/arm64/mac',
     'darwin/x64/mac',
+    'linux/x64/appimage',
     'linux/x64/deb',
     'linux/x64/rpm',
     'win32/x64/squirrel',
@@ -276,10 +277,15 @@ async function stage() {
       `WebRad-${version}-win32-${arch}-Setup.exe`,
     );
   } else if (platform === 'linux') {
-    for (const kind of ['deb', 'rpm']) {
+    for (const kind of ['appimage', 'deb', 'rpm']) {
+      const extension = kind === 'appimage' ? '.AppImage' : `.${kind}`;
       await target(
-        exactlyOne(files, (file) => file.endsWith(`.${kind}`), `Linux ${kind}`),
-        `WebRad-${version}-linux-${arch}.${kind}`,
+        exactlyOne(
+          files,
+          (file) => file.toLowerCase().endsWith(extension.toLowerCase()),
+          `Linux ${kind}`,
+        ),
+        `WebRad-${version}-linux-${arch}${extension}`,
         kind,
       );
     }
@@ -374,7 +380,7 @@ async function publish() {
   );
   await fs.writeFile(
     notesPath,
-    `WebRad ${manifest.version}\n\nInstallers for Windows x64, Linux x64 (.deb/.rpm), macOS Intel and macOS Apple Silicon.\n\n${unsignedMac ? 'The macOS builds are unsigned. macOS may block opening them; automatic macOS installation is unavailable until Developer ID signing is configured.\n\n' : ''}SHA-256 checksums are included in SHA256SUMS.\n`,
+    `WebRad ${manifest.version}\n\nInstallers for Windows x64, Linux x64 (.AppImage/.deb/.rpm), macOS Intel and macOS Apple Silicon.\n\n${unsignedMac ? 'The macOS builds are unsigned. macOS may block opening them; automatic macOS installation is unavailable until Developer ID signing is configured.\n\n' : ''}SHA-256 checksums are included in SHA256SUMS.\n`,
   );
   let existing;
   try {

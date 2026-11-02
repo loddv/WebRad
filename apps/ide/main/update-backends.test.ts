@@ -99,4 +99,31 @@ describe('native update protocols', () => {
     expect(mocks.quitAndInstall).not.toHaveBeenCalled();
     expect(autoUpdater.listenerCount('error')).toBe(0);
   });
+  it('selects the AppImage artifact for portable AppImage installations', async () => {
+    vi.stubGlobal('process', {
+      ...process,
+      platform: 'linux',
+      arch: 'x64',
+      env: { ...process.env, APPIMAGE: '/tmp/WebRad.AppImage' },
+    });
+    const manifest: UpdateManifest = {
+      formatVersion: 1,
+      version: '0.2.0',
+      publishedAt: '2026-10-15T12:00:00.000Z',
+      targets: [
+        {
+          platform: 'linux',
+          arch: 'x64',
+          kind: 'appimage',
+          file: 'WebRad-0.2.0-linux-x64.AppImage',
+          size: 10,
+          sha256: 'a'.repeat(64),
+          signed: false,
+        },
+      ],
+    };
+    const { target, backend } = await selectUpdateBackend('Atentor/WebRad', manifest);
+    expect(target.kind).toBe('appimage');
+    expect(backend.mode).toBe('manual');
+  });
 });

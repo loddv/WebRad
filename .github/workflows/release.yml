@@ -145,6 +145,12 @@ jobs:
         run: npm run smoke:packaged -- --webrad-smoke-updates
       - name: Generate distributables
         run: npm run make -- --skip-package
+      - name: Verify Linux AppImage
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          mapfile -t appimages < <(find out/make -type f -name '*.AppImage' -print)
+          test "${#appimages[@]}" -eq 1
       - name: Stage installers and update metadata
         run: node scripts/release-tools.mjs stage
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
